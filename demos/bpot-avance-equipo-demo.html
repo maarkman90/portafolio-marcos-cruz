@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avance del Equipo · BPOT Ops Console — Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme_demo_bpot') || 'dark';
+            if (theme === 'light') { document.documentElement.classList.add('light'); }
+        })();
+    </script>
+    <style>
+        :root {
+            --bg: #121316;
+            --bg-elev-1: #181a1f;
+            --bg-elev-2: #1e2126;
+            --border: #2a2d34;
+            --border-soft: #22252b;
+            --text-1: #eef0f3;
+            --text-2: #a8adb8;
+            --text-3: #6b7280;
+            --accent: #3b82f6;
+            --accent-soft: rgba(59, 130, 246, .12);
+            --accent-2: #f59e0b;
+            --ok: #22c55e;
+            --ok-soft: rgba(34, 197, 94, .12);
+            --warn: #f59e0b;
+            --warn-soft: rgba(245, 158, 11, .12);
+            --danger: #ef4444;
+            --danger-soft: rgba(239, 68, 68, .12);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-w: 236px;
+        }
+
+        .light {
+            --bg: #f5f6f8;
+            --bg-elev-1: #ffffff;
+            --bg-elev-2: #fafbfc;
+            --border: #e3e5e9;
+            --border-soft: #ececef;
+            --text-1: #15171c;
+            --text-2: #565b66;
+            --text-3: #8a8f99;
+            --accent: #2563eb;
+            --accent-soft: rgba(37, 99, 235, .08);
+            --ok: #16a34a;
+            --ok-soft: rgba(22, 163, 74, .08);
+            --warn: #d97706;
+            --warn-soft: rgba(217, 119, 6, .08);
+            --danger: #dc2626;
+            --danger-soft: rgba(220, 38, 38, .08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text-1);
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            transition: background .2s, color .2s;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        svg.icon {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 1.7;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .shell {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-w);
+            flex-shrink: 0;
+            background: var(--bg-elev-1);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 20px 20px 18px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .brand-mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .brand-text b {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: .2px;
+        }
+
+        .brand-text span {
+            font-size: 10.5px;
+            color: var(--text-3);
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+
+        .nav {
+            flex: 1;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow-y: auto;
+        }
+
+        .nav-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-3);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            padding: 14px 10px 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: var(--radius-sm);
+            color: var(--text-2);
+            font-size: 13.5px;
+            font-weight: 500;
+            transition: background .12s, color .12s;
+            cursor: pointer;
+        }
+
+        .nav-item svg {
+            stroke: var(--text-3);
+            transition: stroke .12s;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-elev-2);
+            color: var(--text-1);
+        }
+
+        .nav-item:hover svg {
+            stroke: var(--text-1);
+        }
+
+        .nav-item.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .nav-item.active svg {
+            stroke: var(--accent);
+        }
+
+        .sidebar-footer {
+            padding: 14px 16px;
+            border-top: 1px solid var(--border-soft);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mini-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-elev-2);
+            font-size: 12.5px;
+            color: var(--text-2);
+        }
+
+        .mini-toggle .lbl {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .switch {
+            position: relative;
+            width: 32px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch .track {
+            position: absolute;
+            inset: 0;
+            background: var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .switch .track:before {
+            content: '';
+            position: absolute;
+            height: 14px;
+            width: 14px;
+            left: 2px;
+            top: 2px;
+            background: #fff;
+            border-radius: 50%;
+            transition: .2s;
+        }
+
+        .switch input:checked+.track {
+            background: var(--accent);
+        }
+
+        .switch input:checked+.track:before {
+            transform: translateX(14px);
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            height: 56px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            border-bottom: 1px solid var(--border-soft);
+            background: var(--bg-elev-1);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-3);
+        }
+
+        .breadcrumb b {
+            color: var(--text-1);
+            font-weight: 600;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demo-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-2);
+            background: var(--warn-soft);
+            border: 1px solid rgba(245, 158, 11, .3);
+            padding: 5px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .icon-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-2);
+            cursor: pointer;
+            transition: .12s;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-elev-2);
+            border-color: var(--border);
+            color: var(--text-1);
+        }
+
+        .content {
+            padding: 28px 28px 60px;
+            max-width: 1360px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .page-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 22px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .page-head h1 {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -.2px;
+            margin-bottom: 4px;
+        }
+
+        .page-head p {
+            color: var(--text-3);
+            font-size: 13px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: .14s;
+            background: var(--bg-elev-2);
+            color: var(--text-1);
+        }
+
+        .btn:hover {
+            border-color: var(--text-3);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: #2f6fe0;
+            border-color: #2f6fe0;
+        }
+
+        .panel {
+            background: var(--bg-elev-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px 20px 22px;
+            margin-bottom: 20px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 30px 0 14px;
+        }
+
+        .section-head h3 {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .section-head .line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 26px;
+        }
+
+        .kpi-card {
+            background: var(--bg-elev-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 18px 18px 16px;
+            position: relative;
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .kpi-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kpi-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .kpi-icon.blue {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .kpi-icon.green {
+            background: var(--ok-soft);
+            color: var(--ok);
+        }
+
+        .kpi-icon.amber {
+            background: var(--warn-soft);
+            color: var(--warn);
+        }
+
+        .kpi-icon.gray {
+            background: var(--bg-elev-2);
+            color: var(--text-2);
+            border: 1px solid var(--border);
+        }
+
+        .kpi-num {
+            font-family: var(--font-display);
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -.5px;
+            margin-bottom: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .kpi-lbl {
+            font-size: 12px;
+            color: var(--text-3);
+            font-weight: 500;
+        }
+
+        .mini-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mini-progress .track {
+            flex: 1;
+            height: 5px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .mini-progress .fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--accent);
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .chart-card {
+            background: var(--bg-elev-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+        }
+
+        .chart-card h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-2);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 16px;
+        }
+
+        .chart-card canvas {
+            max-height: 260px;
+        }
+
+        .leaderboard {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .lb-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 4px;
+        }
+
+        .lb-rank {
+            width: 22px;
+            text-align: center;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-3);
+        }
+
+        .lb-rank.top1 {
+            color: var(--accent-2);
+        }
+
+        .lb-rank.top2 {
+            color: var(--text-2);
+        }
+
+        .lb-rank.top3 {
+            color: #b57a4a;
+        }
+
+        .lb-name {
+            width: 90px;
+            font-size: 12.5px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .lb-bar-track {
+            flex: 1;
+            height: 8px;
+            background: var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .lb-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            background: var(--accent);
+        }
+
+        .lb-val {
+            width: 36px;
+            text-align: right;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .simple-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+
+        .simple-table th {
+            text-align: left;
+            padding: 9px 12px;
+            color: var(--text-3);
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .simple-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .simple-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .simple-table tr:hover td {
+            background: var(--bg-elev-2);
+        }
+
+        @media (max-width: 1100px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                display: none;
+            }
+
+            .content {
+                padding: 18px 16px 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="shell">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-mark">B</div>
+                <div class="brand-text"><b>BPOT Ops</b><span>Console</span></div>
+            </div>
+            <nav class="nav">
+                <div class="nav-label">Operación</div>
+                <a class="nav-item" href="bpot-ops-console-demo.html">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M9 11l3 3L22 4" />
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
+                    Revisión de proceso
+                </a>
+                <a class="nav-item active" href="#">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 3v18h18" />
+                        <path d="M18.7 8 12 14.7 8.7 11.4 4 16" />
+                    </svg>
+                    Avance del equipo
+                </a>
+                <a class="nav-item" href="bpot-dashboard-ejecutivo-demo.html">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="9" rx="1" />
+                        <rect x="14" y="3" width="7" height="5" rx="1" />
+                        <rect x="14" y="12" width="7" height="9" rx="1" />
+                        <rect x="3" y="16" width="7" height="5" rx="1" />
+                    </svg>
+                    Dashboard ejecutivo
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="mini-toggle">
+                    <span class="lbl">
+                        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;">
+                            <circle cx="12" cy="12" r="4" />
+                            <path
+                                d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+                        </svg>
+                        <span id="theme-toggle-label">Modo claro</span>
+                    </span>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle-switch" onchange="toggleTheme()">
+                        <span class="track"></span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main">
+            <div class="topbar">
+                <div class="breadcrumb">Plataforma <span>/</span> <b>Avance del equipo</b></div>
+                <div class="topbar-actions">
+                    <div class="demo-badge">
+                        <svg class="icon" viewBox="0 0 24 24" style="width:12px;height:12px;">
+                            <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" />
+                        </svg>
+                        Demo con datos ficticios
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="page-head">
+                    <div>
+                        <h1>Avance del Equipo</h1>
+                        <p>Seguimiento de progreso, cumplimiento de checklist y actividad reciente del equipo BPOT.</p>
+                    </div>
+                    <button class="btn btn-primary"
+                        onclick="alert('Exportación deshabilitada en la demo. En producción genera un CSV real desde la base de datos.')">
+                        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Exportar CSV
+                    </button>
+                </div>
+
+                <div class="panel"
+                    style="display:flex;align-items:center;gap:16px;margin-bottom:20px;border-left:3px solid var(--accent-2);">
+                    <svg class="icon" viewBox="0 0 24 24"
+                        style="width:20px;height:20px;stroke:var(--accent-2);flex-shrink:0;">
+                        <path d="M12 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+                        <path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12" />
+                    </svg>
+                    <div>
+                        <div
+                            style="font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;">
+                            Podio del equipo</div>
+                        <div style="font-size:14px;font-weight:600;">🥇 Ana G. — 🥈 Diana T. — 🥉 Carlos R.</div>
+                    </div>
+                </div>
+
+                <div class="section-head">
+                    <h3>Indicadores clave</h3>
+                    <div class="line"></div>
+                </div>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon blue"><svg class="icon" viewBox="0 0 24 24">
+                                    <rect x="3" y="3" width="7" height="7" />
+                                    <rect x="14" y="3" width="7" height="7" />
+                                    <rect x="14" y="14" width="7" height="7" />
+                                    <rect x="3" y="14" width="7" height="7" />
+                                </svg></div>
+                        </div>
+                        <div class="kpi-num">8</div>
+                        <div class="kpi-lbl">Total procesos</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon amber"><svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+                                    <path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12" />
+                                </svg></div>
+                        </div>
+                        <div class="kpi-num">2</div>
+                        <div class="kpi-lbl">Completados al 100%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon gray"><svg class="icon" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 6v6l4 2" />
+                                </svg></div>
+                        </div>
+                        <div class="kpi-num">3</div>
+                        <div class="kpi-lbl">Sin revisar</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon green"><svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M3 3v18h18" />
+                                    <path d="M18.7 8 12 14.7 8.7 11.4 4 16" />
+                                </svg></div>
+                        </div>
+                        <div class="kpi-num">47%</div>
+                        <div class="kpi-lbl">Avance promedio</div>
+                        <div class="mini-progress" style="margin-top:8px;">
+                            <div class="track">
+                                <div class="fill" style="width:47%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-head">
+                    <h3>Distribución y responsables</h3>
+                    <div class="line"></div>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h4>Distribución por estatus</h4>
+                        <canvas id="graficaEstatus" height="220"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Completados al 100% por usuario</h4>
+                        <div class="leaderboard">
+                            <div class="lb-row">
+                                <div class="lb-rank top1">1</div>
+                                <div class="lb-name">Ana G.</div>
+                                <div class="lb-bar-track">
+                                    <div class="lb-bar-fill" style="width:100%"></div>
+                                </div>
+                                <div class="lb-val">2</div>
+                            </div>
+                            <div class="lb-row">
+                                <div class="lb-rank top2">2</div>
+                                <div class="lb-name">Diana T.</div>
+                                <div class="lb-bar-track">
+                                    <div class="lb-bar-fill" style="width:50%"></div>
+                                </div>
+                                <div class="lb-val">1</div>
+                            </div>
+                            <div class="lb-row">
+                                <div class="lb-rank top3">3</div>
+                                <div class="lb-name">Carlos R.</div>
+                                <div class="lb-bar-track">
+                                    <div class="lb-bar-fill" style="width:0%"></div>
+                                </div>
+                                <div class="lb-val">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-head">
+                    <h3>Actividad temporal</h3>
+                    <div class="line"></div>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h4>Revisiones registradas por semana</h4>
+                        <canvas id="graficaFecha" height="220"></canvas>
+                    </div>
+                    <div class="chart-card" style="overflow-x:auto;">
+                        <h4>Avance semanal del equipo (completados al 100%)</h4>
+                        <div style="min-width: 480px;">
+                            <canvas id="graficaUsuarioSemana" height="220"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-head">
+                    <h3>Cumplimiento del checklist</h3>
+                    <div class="line"></div>
+                </div>
+                <div class="chart-card" style="margin-bottom:26px;">
+                    <h4>Ítems del checklist más completados</h4>
+                    <canvas id="graficaChecklist" height="100"></canvas>
+                </div>
+
+                <div class="section-head">
+                    <h3>Usuarios y procesos por revisar</h3>
+                    <div class="line"></div>
+                </div>
+                <div class="panel" style="margin-bottom:26px;">
+                    <table class="simple-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Usuario</th>
+                                <th>Procesos faltantes (avance < 100%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="color:var(--text-3);">1</td>
+                                <td>Sofía M.</td>
+                                <td style="color:var(--danger);font-weight:700;">2</td>
+                            </tr>
+                            <tr>
+                                <td style="color:var(--text-3);">2</td>
+                                <td>Carlos R.</td>
+                                <td style="color:var(--danger);font-weight:700;">2</td>
+                            </tr>
+                            <tr>
+                                <td style="color:var(--text-3);">3</td>
+                                <td>Luis P.</td>
+                                <td style="color:var(--danger);font-weight:700;">1</td>
+                            </tr>
+                            <tr>
+                                <td style="color:var(--text-3);">4</td>
+                                <td>Ana G.</td>
+                                <td style="color:var(--danger);font-weight:700;">1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const sw = document.getElementById('theme-toggle-switch');
+            const label = document.getElementById('theme-toggle-label');
+            if (sw.checked) {
+                document.documentElement.classList.add('light');
+                localStorage.setItem('theme_demo_bpot', 'light');
+                if (label) label.textContent = 'Modo oscuro';
+            } else {
+                document.documentElement.classList.remove('light');
+                localStorage.setItem('theme_demo_bpot', 'dark');
+                if (label) label.textContent = 'Modo claro';
+            }
+            location.reload();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const sw = document.getElementById('theme-toggle-switch');
+            const label = document.getElementById('theme-toggle-label');
+            if (sw) {
+                const current = localStorage.getItem('theme_demo_bpot') || 'dark';
+                sw.checked = (current === 'light');
+                if (label) label.textContent = current === 'light' ? 'Modo oscuro' : 'Modo claro';
+            }
+        });
+
+        const isLight = document.documentElement.classList.contains('light');
+        const colorTexto = isLight ? '#565b66' : '#a8adb8';
+        const colorRejilla = isLight ? '#e3e5e9' : '#2a2d34';
+        const colorBorde = isLight ? '#ffffff' : '#181a1f';
+        const coloresPrincipal = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#f97316', '#06b6d4'];
+
+        Chart.defaults.color = colorTexto;
+        Chart.defaults.borderColor = colorRejilla;
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        new Chart(document.getElementById('graficaEstatus').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Integrado', 'Mapeado', 'Identificado'],
+                datasets: [{
+                    data: [2, 3, 2],
+                    backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b'],
+                    borderColor: colorBorde,
+                    borderWidth: 3,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: colorTexto, padding: 16, font: { size: 12 } } },
+                    tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' procesos' } }
+                },
+                cutout: '65%'
+            }
+        });
+
+        new Chart(document.getElementById('graficaFecha').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['2026-W28', '2026-W29', '2026-W30', '2026-W31', '2026-W32'],
+                datasets: [{
+                    label: 'Revisiones',
+                    data: [1, 2, 1, 3, 2],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.12)',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#3b82f6',
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1, color: colorTexto }, grid: { color: colorRejilla } },
+                    x: { ticks: { color: colorTexto }, grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        new Chart(document.getElementById('graficaUsuarioSemana').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['2026-W28', '2026-W29', '2026-W30', '2026-W31', '2026-W32'],
+                datasets: [
+                    { label: 'Ana G.', data: [1, 0, 0, 1, 0], backgroundColor: '#4299e1', borderColor: '#553c9a', borderWidth: 1 },
+                    { label: 'Diana T.', data: [0, 1, 0, 0, 0], backgroundColor: '#38a169', borderColor: '#285e61', borderWidth: 1 },
+                    { label: 'Carlos R.', data: [0, 0, 1, 0, 1], backgroundColor: '#d69e2e', borderColor: '#c05621', borderWidth: 1 }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { stacked: true, ticks: { color: colorTexto }, grid: { display: false } },
+                    y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, color: colorTexto }, grid: { color: colorRejilla } }
+                },
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: colorTexto, usePointStyle: true, boxWidth: 8 } },
+                    tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.parsed.y } }
+                },
+                animation: false
+            }
+        });
+
+        new Chart(document.getElementById('graficaChecklist').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Nombre correcto', 'Proceso base', 'Objetos reutilizables', 'Subprocesos Linkeados', 'Lógica de proceso', 'Sin acentos ni ñ', 'Freeze Visible', 'Corrección de app/servicio', 'Narrativa en actividades'],
+                datasets: [{
+                    label: 'Veces completado',
+                    data: [5, 5, 4, 4, 3, 5, 2, 3, 2],
+                    backgroundColor: coloresPrincipal,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1, color: colorTexto }, grid: { color: colorRejilla } },
+                    x: { ticks: { color: colorTexto, maxRotation: 20 }, grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+</body>
+
+</html>

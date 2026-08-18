@@ -1,0 +1,28 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    container_name: bpot-portafolio-web
+    restart: unless-stopped
+    networks:
+      - portafolio-net
+    ports:
+      - "8080:80"
+    # No exponemos puerto 80 directamente; cloudflared habla con "web:80" en la red interna y 8080 queda para pruebas locales.
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: bpot-portafolio-tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - web
+    networks:
+      - portafolio-net
+
+networks:
+  portafolio-net:
+    driver: bridge

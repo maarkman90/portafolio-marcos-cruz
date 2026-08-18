@@ -1,0 +1,11 @@
+# Variables de entorno (contienen el token del Cloudflare Tunnel)
+.env
+
+# Sistema
+.DS_Store
+
+# Docker
+*.log
+
+# Herramientas internas de desarrollo
+.graphify/
