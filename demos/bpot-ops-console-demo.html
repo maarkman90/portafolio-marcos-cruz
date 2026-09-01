@@ -7,7 +7,7 @@
     <title>BPOT Ops Console — Demo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
         rel="stylesheet">
     <script>
         (function () {
@@ -17,48 +17,49 @@
     </script>
     <style>
         :root {
-            --bg: #121316;
-            --bg-elev-1: #181a1f;
-            --bg-elev-2: #1e2126;
-            --border: #2a2d34;
-            --border-soft: #22252b;
-            --text-1: #eef0f3;
-            --text-2: #a8adb8;
-            --text-3: #6b7280;
-            --accent: #3b82f6;
-            --accent-soft: rgba(59, 130, 246, .12);
-            --accent-2: #f59e0b;
-            --ok: #22c55e;
-            --ok-soft: rgba(34, 197, 94, .12);
-            --warn: #f59e0b;
-            --warn-soft: rgba(245, 158, 11, .12);
-            --danger: #ef4444;
-            --danger-soft: rgba(239, 68, 68, .12);
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --font-display: 'Space Grotesk', sans-serif;
+            --bg: #17130f;
+            --bg-elev-1: #1e1913;
+            --bg-elev-2: #251f17;
+            --border: #362c1e;
+            --border-soft: #2b2418;
+            --text-1: #f1e9da;
+            --text-2: #b6a68d;
+            --text-3: #7d715c;
+            --accent: #c1682f;
+            --accent-soft: rgba(193, 104, 47, .14);
+            --accent-2: #b8862e;
+            --ok: #7a9b5a;
+            --ok-soft: rgba(122, 155, 90, .14);
+            --warn: #b8862e;
+            --warn-soft: rgba(184, 134, 46, .14);
+            --danger: #b3452f;
+            --danger-soft: rgba(179, 69, 47, .14);
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 4px;
+            --font-display: 'Fraunces', Georgia, serif;
             --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
             --sidebar-w: 236px;
         }
 
         .light {
-            --bg: #f5f6f8;
-            --bg-elev-1: #ffffff;
-            --bg-elev-2: #fafbfc;
-            --border: #e3e5e9;
-            --border-soft: #ececef;
-            --text-1: #15171c;
-            --text-2: #565b66;
-            --text-3: #8a8f99;
-            --accent: #2563eb;
-            --accent-soft: rgba(37, 99, 235, .08);
-            --ok: #16a34a;
-            --ok-soft: rgba(22, 163, 74, .08);
-            --warn: #d97706;
-            --warn-soft: rgba(217, 119, 6, .08);
-            --danger: #dc2626;
-            --danger-soft: rgba(220, 38, 38, .08);
+            --bg: #f2e8da;
+            --bg-elev-1: #fbf5eb;
+            --bg-elev-2: #f5ebe0;
+            --border: #ddccae;
+            --border-soft: #e9dcc6;
+            --text-1: #2b2015;
+            --text-2: #6f5f49;
+            --text-3: #9c8b6f;
+            --accent: #a8471f;
+            --accent-soft: rgba(168, 71, 31, .08);
+            --ok: #5f7a45;
+            --ok-soft: rgba(95, 122, 69, .08);
+            --warn: #9c6f1f;
+            --warn-soft: rgba(156, 111, 31, .08);
+            --danger: #8c3a28;
+            --danger-soft: rgba(140, 58, 40, .08);
         }
 
         *,
@@ -345,10 +346,11 @@
             font-weight: 700;
             color: var(--accent-2);
             background: var(--warn-soft);
-            border: 1px solid rgba(245, 158, 11, .3);
+            border: 1px solid rgba(184, 134, 46, .3);
             padding: 5px 10px;
-            border-radius: 20px;
+            border-radius: 3px;
             white-space: nowrap;
+            font-family: var(--font-mono);
         }
 
         .icon-btn {
@@ -376,7 +378,7 @@
             align-items: center;
             gap: 8px;
             padding: 5px 10px 5px 5px;
-            border-radius: 20px;
+            border-radius: 3px;
             border: 1px solid var(--border);
             background: var(--bg-elev-2);
             font-size: 12.5px;
@@ -573,8 +575,7 @@
         }
 
         .btn-primary:hover {
-            background: #2f6fe0;
-            border-color: #2f6fe0;
+            filter: brightness(1.12);
         }
 
         .btn-ok {
@@ -714,7 +715,7 @@
             align-items: center;
             gap: 5px;
             padding: 3px 9px;
-            border-radius: 20px;
+            border-radius: 3px;
             font-size: 10.5px;
             font-weight: 700;
             text-transform: uppercase;
@@ -779,7 +780,7 @@
             color: var(--text-2);
             width: 30px;
             text-align: right;
-            font-family: var(--font-display);
+            font-family: var(--font-mono);
         }
 
         .field {
@@ -858,7 +859,7 @@
         }
 
         .ring-num {
-            font-family: var(--font-display);
+            font-family: var(--font-mono);
             font-size: 24px;
             font-weight: 700;
             line-height: 1;
@@ -901,7 +902,7 @@
             gap: 8px;
             padding: 10px 12px;
             background: var(--warn-soft);
-            border: 1px solid rgba(245, 158, 11, .25);
+            border: 1px solid rgba(184, 134, 46, .25);
             border-radius: var(--radius-sm);
             font-size: 12px;
             color: var(--warn);
@@ -980,7 +981,7 @@
             font-size: 10.5px;
             font-weight: 700;
             color: var(--text-3);
-            font-family: var(--font-display);
+            font-family: var(--font-mono);
         }
 
         .save-bar {
